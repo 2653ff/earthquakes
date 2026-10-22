@@ -48,13 +48,16 @@ def get_data(save: Path | None = None):
     return json.loads(text)
 
 
-def count_earthquakes(data: dict):
+def count_earthquakes(data: dict) -> int:
     """Get the total number of earthquakes in the response.
 
     The 'features' key is a list of dictionaries, with each list
-    entry corresponding to a single earthquake.
+    entry corresponding to a single earthquake. However, the
+    'metadata' key also provides the answer as a single number.
     """
-    return len(data["features"])
+    # return len(data["features"])
+    # would also work here.
+    return data["metadata"]["count"]
 
 
 def get_magnitude(earthquake: dict) -> float:
@@ -66,17 +69,17 @@ def get_magnitude(earthquake: dict) -> float:
     return earthquake["properties"]["mag"]
 
 
-def get_location(earthquake: dict) -> tuple[float, float]:
+def get_location(earthquake: dict) -> list[float]:
     """Retrieve the latitude and longitude of an earthquake item.
 
     An earthquake item is a single entry in `data["features"]`.
     The lat / long coords are found under the geometry -> coordinates key.
     """
     # There are three coordinates, but we don't care about the third (altitude)
-    return tuple(earthquake["geometry"]["coordinates"][:2])
+    return earthquake["geometry"]["coordinates"][:2]
 
 
-def get_maximum(data: dict):
+def get_maximum(data: dict) -> tuple[float, list[float]]:
     """Get the magnitude and location of the strongest earthquake in the data.
 
     This can be efficiently done using our methods above.
