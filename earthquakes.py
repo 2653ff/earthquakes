@@ -2,6 +2,7 @@
 # over the Internet.
 # However, we will use a more powerful and simpler library called requests.
 # This is external library that you may need to install first.
+import argparse
 import json
 from pathlib import Path
 
@@ -32,6 +33,7 @@ def get_data(save: Path | None = None):
     # to a file and open it in VS Code or a browser.
     # See the README file for more information.
     # NOTE: It is a JSON file.
+
     # We need to interpret the text to get values that we can work with.
     # What format is the text in? How can we load the values?
     json_obj = json.loads(text)
@@ -86,7 +88,15 @@ def get_maximum(data: dict):
 
 # With all the above functions defined, we can now call them and get the result
 if __name__ == "__main__":
-    data = get_data(Path("./raw_data.json"))
+    parser = argparse.ArgumentParser(
+        description="Fetches US geological survey earthquake data from 2000-01-01 to 2018-10-11."
+    )
+    parser.add_argument("-s", "--save", nargs=1, type=str, default=None)
+    args = parser.parse_args()
+    if (save := args.save) is not None:
+        save = Path(args.save)
+
+    data = get_data(save)
     print(f"Loaded {count_earthquakes(data)}")
 
     max_magnitude, max_location = get_maximum(data)
