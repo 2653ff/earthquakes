@@ -10,10 +10,10 @@ import requests
 # Some 'utility' functions we've written can be imported for us to use here.
 # We put these in another file because they're not super relevant to the
 # actual analysis that we want to do here.
-from _utils import read_cli_args
+from _utils import Earthquake, EQDataset, read_cli_args
 
 
-def get_data(save: Path | None = None):
+def get_data(save: Path | None = None) -> EQDataset:
     # With requests, we can ask the web service for the data.
     # Can you understand the parameters we are passing here?
     response = requests.get(
@@ -48,7 +48,7 @@ def get_data(save: Path | None = None):
     return json.loads(text)
 
 
-def count_earthquakes(data: dict) -> int:
+def count_earthquakes(data: EQDataset) -> int:
     """Get the total number of earthquakes in the response.
 
     The 'features' key is a list of dictionaries, with each list
@@ -60,7 +60,7 @@ def count_earthquakes(data: dict) -> int:
     return data["metadata"]["count"]
 
 
-def get_magnitude(earthquake: dict) -> float:
+def get_magnitude(earthquake: Earthquake) -> float:
     """Retrieve the magnitude of an earthquake item.
 
     An earthquake item is a single entry in `data["features"]`.
@@ -69,7 +69,7 @@ def get_magnitude(earthquake: dict) -> float:
     return earthquake["properties"]["mag"]
 
 
-def get_location(earthquake: dict) -> list[float]:
+def get_location(earthquake: Earthquake) -> list[float]:
     """Retrieve the latitude and longitude of an earthquake item.
 
     An earthquake item is a single entry in `data["features"]`.
@@ -79,7 +79,7 @@ def get_location(earthquake: dict) -> list[float]:
     return earthquake["geometry"]["coordinates"][:2]
 
 
-def get_maximum(data: dict) -> tuple[float, list[float]]:
+def get_maximum(data: EQDataset) -> tuple[float, list[float]]:
     """Get the magnitude and location of the strongest earthquake in the data.
 
     This can be efficiently done using our methods above.
