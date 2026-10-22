@@ -2,11 +2,15 @@
 # over the Internet.
 # However, we will use a more powerful and simpler library called requests.
 # This is external library that you may need to install first.
-import argparse
 import json
 from pathlib import Path
 
 import requests
+
+# Some 'utility' functions we've written can be imported for us to use here.
+# We put these in another file because they're not super relevant to the
+# actual analysis that we want to do here.
+from _utils import read_cli_args
 
 
 def get_data(save: Path | None = None):
@@ -88,15 +92,9 @@ def get_maximum(data: dict):
 
 # With all the above functions defined, we can now call them and get the result
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Fetches US geological survey earthquake data from 2000-01-01 to 2018-10-11."
-    )
-    parser.add_argument("-s", "--save", nargs=1, type=str, default=None)
-    args = parser.parse_args()
-    if (save := args.save) is not None:
-        save = Path(args.save)
+    args = read_cli_args()
 
-    data = get_data(save)
+    data = get_data(args.save)
     print(f"Loaded {count_earthquakes(data)}")
 
     max_magnitude, max_location = get_maximum(data)
