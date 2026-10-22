@@ -42,25 +42,46 @@ def get_data(save: Path | None = None):
     return json.loads(text)
 
 
-def count_earthquakes(data):
-    """Get the total number of earthquakes in the response."""
-    return ...
+def count_earthquakes(data: dict):
+    """Get the total number of earthquakes in the response.
+
+    The 'features' key is a list of dictionaries, with each list
+    entry corresponding to a single earthquake.
+    """
+    return len(data["features"])
 
 
-def get_magnitude(earthquake):
-    """Retrieve the magnitude of an earthquake item."""
-    return ...
+def get_magnitude(earthquake: dict) -> float:
+    """Retrieve the magnitude of an earthquake item.
+
+    An earthquake item is a single entry in `data["features"]`.
+    The magnitude is found under the properties -> mag key.
+    """
+    return earthquake["properties"]["mag"]
 
 
-def get_location(earthquake):
-    """Retrieve the latitude and longitude of an earthquake item."""
+def get_location(earthquake: dict) -> tuple[float, float]:
+    """Retrieve the latitude and longitude of an earthquake item.
+
+    An earthquake item is a single entry in `data["features"]`.
+    The lat / long coords are found under the geometry -> coordinates key.
+    """
     # There are three coordinates, but we don't care about the third (altitude)
-    return ...
+    return tuple(earthquake["geometry"]["coordinates"][:2])
 
 
-def get_maximum(data):
-    """Get the magnitude and location of the strongest earthquake in the data."""
-    ...
+def get_maximum(data: dict):
+    """Get the magnitude and location of the strongest earthquake in the data.
+
+    This can be efficiently done using our methods above.
+    - First, sort the earthquake entries by magnitude. The strongest earthquake
+      will appear at the end of the resulting list.
+    - Extract this earthquake, and use `get_magnitude` and `get_location` to
+      return the required information.
+    """
+    sorted_by_mag = sorted(data["features"], key=get_magnitude)
+    strongest_earthquake = sorted_by_mag[-1]
+    return get_magnitude(strongest_earthquake), get_location(strongest_earthquake)
 
 
 # With all the above functions defined, we can now call them and get the result
